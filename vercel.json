@@ -1,10 +1,10 @@
 {
   "builds": [
     {
-      "src": "frontend/customer/package.json",
+      "src": "customer/package.json",
       "use": "@vercel/static-build",
       "config": {
-        "distDir": "frontend/customer/dist"
+        "distDir": "customer/dist"
       }
     }
   ]
