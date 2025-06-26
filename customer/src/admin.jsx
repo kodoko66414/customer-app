@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { db } from "./firebase";
 import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
+import ReactDOM from "react-dom/client";
 
 function AdminOrderDashboard() {
   const [orders, setOrders] = useState([]);
@@ -37,4 +38,8 @@ function AdminOrderDashboard() {
   );
 }
 
-export default AdminOrderDashboard; 
+export default AdminOrderDashboard;
+
+// 這段是關鍵，讓 admin.html 能正確渲染
+const root = ReactDOM.createRoot(document.getElementById("root"));
+root.render(<AdminOrderDashboard />); 
