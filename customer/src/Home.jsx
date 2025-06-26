@@ -238,7 +238,6 @@ export default function Home() {
     orders.push({ items, total, orderId, complete: false });
     localStorage.setItem('orders', JSON.stringify(orders));
     setCart([]);
-    setShowCart(false);
     setLastOrderId(orderId);
   };
 
