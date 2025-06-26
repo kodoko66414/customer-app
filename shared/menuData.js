@@ -1,5 +1,3 @@
-export * from '../../shared/menuData';
-
 export const menu = [
   { id: 1, name: '起司蛋餅', price: 55, category: 'egg_pancake' },
   { id: 2, name: '火腿蛋餅', price: 45, category: 'egg_pancake' },

@@ -1,0 +1,27 @@
+{
+  "name": "customer-app",
+  "private": true,
+  "workspaces": [
+    "customer",
+    "admin",
+    "dashboard",
+    "shared"
+  ],
+  "version": "1.0.0",
+  "description": "本專案為一套適合所有年齡層（學生、上班族、長輩）使用的早餐點餐系統 DEMO，包含：\r - 點餐系統模組（顧客端）\r - 訂單管理模組（櫃台/廚房端）\r - 後台管理模組（老闆端）",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kodoko66414/customer-app.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kodoko66414/customer-app/issues"
+  },
+  "homepage": "https://github.com/kodoko66414/customer-app#readme"
+}
