@@ -1,31 +1,40 @@
-import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
-import OrderDashboard from './OrderDashboard';
+import React, { useEffect, useState } from "react";
+import { db } from "./firebase";
+import { collection, onSnapshot, query, orderBy } from "firebase/firestore";
 
-function AdminApp() {
+function AdminOrderDashboard() {
   const [orders, setOrders] = useState([]);
 
-  // 從 localStorage 讀取訂單
   useEffect(() => {
-    const stored = localStorage.getItem('orders');
-    if (stored) setOrders(JSON.parse(stored));
+    const q = query(collection(db, "orders"), orderBy("createdAt", "desc"));
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+      setOrders(snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() })));
+    });
+    return () => unsubscribe();
   }, []);
 
-  // 完成/刪除訂單時同步 localStorage
-  const completeOrder = (index) => {
-    const newOrders = orders.map((o, i) => i === index ? { ...o, complete: true } : o);
-    setOrders(newOrders);
-    localStorage.setItem('orders', JSON.stringify(newOrders));
-  };
-  const removeOrder = (index) => {
-    const newOrders = orders.filter((_, i) => i !== index);
-    setOrders(newOrders);
-    localStorage.setItem('orders', JSON.stringify(newOrders));
-  };
-
-  // 傳給 OrderDashboard 的 props
-  return <OrderDashboard orders={orders} completeOrder={completeOrder} removeOrder={removeOrder} />;
+  return (
+    <div style={{ maxWidth: 600, margin: '0 auto', padding: 24, fontFamily: 'Arial, sans-serif' }}>
+      <h1 style={{ fontSize: 32, textAlign: 'center', marginBottom: 24 }}>店家訂單端</h1>
+      {orders.length === 0 ? (
+        <div style={{ fontSize: 22, textAlign: 'center' }}>目前沒有訂單</div>
+      ) : (
+        orders.map(order => (
+          <div key={order.id} style={{ background: '#fff', borderRadius: 16, boxShadow: '0 2px 8px #eee', padding: 16, marginBottom: 18 }}>
+            <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8 }}>訂單時間：{order.createdAt?.toDate?.().toLocaleString?.() || "無"}</div>
+            <ul style={{ paddingLeft: 20 }}>
+              {order.items.map((item, idx) => (
+                <li key={idx} style={{ fontSize: 18 }}>
+                  {item.name} x {item.qty}（NT${item.price}）
+                </li>
+              ))}
+            </ul>
+            <div style={{ fontSize: 18, color: '#007aff', marginTop: 8 }}>總計：NT${order.total}</div>
+          </div>
+        ))
+      )}
+    </div>
+  );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<AdminApp />); 
+export default AdminOrderDashboard; 

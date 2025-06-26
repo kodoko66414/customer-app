@@ -2,6 +2,8 @@ import React, { useState, useRef } from 'react';
 import { menu } from './menuData';
 import ImageWithFallback from './ImageWithFallback';
 import ScrollableMenuView from './ScrollableMenuView';
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+import { db } from "./firebase";
 
 // Audio elements
 const likeAudio = typeof window !== 'undefined' ? new Audio(import.meta.env.BASE_URL + 'sounds/like.mp3') : null;
@@ -224,7 +226,7 @@ export default function Home() {
     setShowCart(true);
   };
 
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (cart.length === 0) return;
     const items = cart.reduce((acc, item) => {
       const found = acc.find(i => i.id === item.id);
@@ -233,12 +235,16 @@ export default function Home() {
       return acc;
     }, []);
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    const orderId = orders.length + 1;
-    orders.push({ items, total, orderId, complete: false });
-    localStorage.setItem('orders', JSON.stringify(orders));
+
+    // 新增到 Firestore
+    await addDoc(collection(db, "orders"), {
+      items,
+      total,
+      createdAt: serverTimestamp()
+    });
+
     setCart([]);
-    setLastOrderId(orderId);
+    setLastOrderId("已送出訂單");
   };
 
   const handleRemoveFromCart = (index) => {
