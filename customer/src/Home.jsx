@@ -169,7 +169,7 @@ export default function Home() {
       if (Math.random() < 0.2) {
         const randomMessage = surpriseMessages[Math.floor(Math.random() * surpriseMessages.length)];
         setSurprise(randomMessage);
-        handleAddToCart(surpriseItem);
+        setCart(prevCart => [...prevCart, surpriseItem]);
         setPendingNext(true); // 等 surprise 關閉後再切換
       } else {
         setCurrentItem(getNextItem(currentItem));
@@ -238,8 +238,12 @@ export default function Home() {
     orders.push({ items, total, orderId, complete: false });
     localStorage.setItem('orders', JSON.stringify(orders));
     setCart([]);
-    setShowCart(true);
+    setShowCart(false);
     setLastOrderId(orderId);
+  };
+
+  const handleRemoveFromCart = (index) => {
+    setCart(prevCart => prevCart.filter((_, i) => i !== index));
   };
 
   if (showMenu) {
@@ -369,74 +373,6 @@ export default function Home() {
     );
   }
 
-  // 點菜單才顯示 ScrollableMenuView
-  if (showMenu) {
-    return (
-      <div style={{ minHeight: '100vh', background: '#f5f5f7', fontFamily: 'Arial, sans-serif', padding: 0 }}>
-        <div style={{ maxWidth: 800, margin: '0 auto', padding: 24 }}>
-          <h1 style={{ fontSize: 36, textAlign: 'center', marginBottom: 24 }}>菜單</h1>
-          <ScrollableMenuView title="熱銷餐點" items={menu.slice(0, 3)} onAddToCart={handleAddToCart} getImageSrc={getImageSrc} />
-          <ScrollableMenuView title="所有餐點" items={menu} onAddToCart={handleAddToCart} getImageSrc={getImageSrc} />
-          <button style={{ width: '100%', fontSize: 22, padding: 14, borderRadius: 14, background: '#f5f5f5', color: '#333', border: 'none', marginTop: 32 }} onClick={() => setShowMenu(false)}>
-            返回主畫面
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div style={{ minHeight: '100vh', background: '#f5f5f7', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', fontFamily: 'Arial, sans-serif', padding: 0 }}>
-      <div style={{ width: '100vw', minHeight: '100vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: 0 }}>
-        <div style={{ maxWidth: 420, width: '100%', margin: '0 auto', padding: 16, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-          <div
-            style={{
-              background: '#fff',
-              borderRadius: 24,
-              boxShadow: `0 8px ${shadow + 24}px rgba(0,0,0,0.12)`,
-              padding: '6vw 4vw 24px 4vw',
-              marginBottom: 24,
-              width: '100%',
-              position: 'relative',
-              userSelect: 'none',
-              touchAction: 'pan-y',
-              display: 'flex',
-              flexDirection: 'column',
-              alignItems: 'center',
-              transition: 'box-shadow 0.2s',
-              transform: `translateX(${dragX}px) rotate(${rotate}deg)`
-            }}
-            onTouchStart={handleTouchStart}
-            onTouchMove={handleTouchMove}
-            onTouchEnd={handleTouchEnd}
-          >
-            <div style={{ fontSize: '7vw', maxFontSize: 32, fontWeight: 'bold', textAlign: 'center', marginBottom: 18, letterSpacing: 2 }}>{item.name}</div>
-            <ImageWithFallback key={item.id} src={getImageSrc(item.category)} alt={item.name} style={{ width: '100%', maxWidth: 320, height: 'auto', aspectRatio: '16/11', objectFit: 'cover', borderRadius: 18, marginBottom: 18, background: '#f5f5f7', boxShadow: '0 2px 12px #eee' }} />
-            <div style={{ fontSize: '6vw', maxFontSize: 32, color: '#ff4d30', textAlign: 'center', fontWeight: 'bold', marginBottom: 24 }}>NT${item.price}</div>
-            <div style={{ display: 'flex', justifyContent: 'space-between', gap: 12, width: '100%' }}>
-              <button onClick={handleDislike} style={{ flex: 1, fontSize: '5vw', maxFontSize: 22, padding: '14px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                <span style={{ fontSize: 32 }}>👎</span>
-                不喜歡
-              </button>
-              <button onClick={handleShowMenu} style={{ flex: 1, fontSize: '5vw', maxFontSize: 22, padding: '14px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                <span style={{ fontSize: 32 }}>≡</span>
-                菜單
-              </button>
-              <button onClick={handleLike} style={{ flex: 1, fontSize: '5vw', maxFontSize: 22, padding: '14px 0', borderRadius: 14, background: '#007aff', color: '#fff', border: 'none', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                <span style={{ fontSize: 32 }}>👍</span>
-                喜歡
-              </button>
-            </div>
-          </div>
-          <div style={{ width: '100%', marginBottom: 24 }}>
-            <ScrollableMenuView title="熱銷餐點" items={menu.slice(0, 3)} onAddToCart={handleAddToCart} getImageSrc={getImageSrc} />
-            <ScrollableMenuView title="所有餐點" items={menu} onAddToCart={handleAddToCart} getImageSrc={getImageSrc} />
-          </div>
-          <button onClick={handleShowCart} style={{ width: '100%', fontSize: '5vw', maxFontSize: 22, padding: 14, borderRadius: 14, background: '#007aff', color: '#fff', border: 'none', marginTop: 8, fontWeight: 600, letterSpacing: 2 }}>
-            購物車（{cart.length}）
-          </button>
-        </div>
-      </div>
-    </div>
-  );
+  // 如果沒有匹配任何條件，返回 null（這不應該發生）
+  return null;
 } 
