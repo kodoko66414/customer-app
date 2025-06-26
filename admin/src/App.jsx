@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import ReactDOM from 'react-dom/client';
 import OrderDashboard from './OrderDashboard';
+import { OrderProvider } from './OrderContext.jsx';
 
 function AdminApp() {
   const [orders, setOrders] = useState([]);
@@ -23,9 +23,11 @@ function AdminApp() {
     localStorage.setItem('orders', JSON.stringify(newOrders));
   };
 
-  // 傳給 OrderDashboard 的 props
-  return <OrderDashboard orders={orders} completeOrder={completeOrder} removeOrder={removeOrder} />;
+  return (
+    <OrderProvider>
+      <OrderDashboard orders={orders} completeOrder={completeOrder} removeOrder={removeOrder} />
+    </OrderProvider>
+  );
 }
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(<AdminApp />); 
+export default AdminApp;

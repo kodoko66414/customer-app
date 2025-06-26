@@ -10,7 +10,6 @@ const OrderDashboard = ({ onClose, orders: propOrders, completeOrder: propComple
   const removeOrder = propRemoveOrder || context.removeOrder || (()=>{});
   const [showCompleted, setShowCompleted] = useState(false);
 
-  // 如果所有訂單都完成，直接顯示沒有訂單
   if (orders.length > 0 && orders.every(o => o.complete)) {
     return <div style={{padding: 24}}>目前沒有訂單</div>;
   }
