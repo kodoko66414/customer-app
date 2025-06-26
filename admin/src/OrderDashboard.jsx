@@ -16,7 +16,9 @@ const OrderDashboard = ({ onClose, orders: propOrders, completeOrder: propComple
 
   const filteredOrders = showCompleted ? orders.filter(o => o.complete) : orders.filter(o => !o.complete);
 
-  if (filteredOrders.length === 0) return <div style={{padding: 24}}>目前沒有{showCompleted ? '已完成' : '未完成'}訂單</div>;
+  if (filteredOrders.length === 0) {
+    return <div style={{padding: 32, textAlign: 'center', color: '#888', fontSize: 20}}>目前沒有{showCompleted ? '已完成' : '未完成'}訂單</div>;
+  }
 
   return (
     <div style={{ background: "#fff", borderRadius: 16, boxShadow: "0 2px 12px #eee", padding: 24, maxWidth: 420, margin: "32px auto" }}>
@@ -25,22 +27,17 @@ const OrderDashboard = ({ onClose, orders: propOrders, completeOrder: propComple
         {showCompleted ? '顯示未完成訂單' : '顯示已完成訂單'}
       </button>
       {filteredOrders.map((order, idx) => (
-        <div key={order.orderId} style={{ border: "1px solid #eee", borderRadius: 12, marginBottom: 24, padding: 16, opacity: order.complete ? 0.7 : 1 }}>
-          <div style={{ fontWeight: 'bold', fontSize: 20, marginBottom: 8, display: 'flex', alignItems: 'center' }}>
-            {order.complete && <span style={{ color: '#0a0', fontSize: 22, marginRight: 6 }}>✔️</span>}
-            訂單編號 {numToChinese(order.orderId)}
-          </div>
+        <div key={order.orderId || idx} style={{ border: "1px solid #eee", borderRadius: 12, marginBottom: 24, padding: 16, opacity: order.complete ? 0.7 : 1 }}>
           {order.items.map((item, i) => (
             <div key={i} style={{ display: "flex", justifyContent: "space-between", fontSize: 22, marginBottom: 4 }}>
               <span>{item.name} X{item.qty || 1}</span>
               <span>{item.price * (item.qty || 1)}</span>
             </div>
           ))}
-          <div style={{ color: "#e00", fontWeight: "bold", fontSize: 24, margin: "12px 0" }}>總金額 {order.total}</div>
           {!order.complete && (
-            <div style={{ display: "flex", gap: 12 }}>
-              <button onClick={() => { completeOrder(orders.findIndex(o => o.orderId === order.orderId)); }} style={{ flex: 1, background: "#e00", color: "#fff", fontSize: 20, border: "none", borderRadius: 8, padding: 10 }}>完成訂單</button>
-              <button onClick={() => removeOrder(orders.findIndex(o => o.orderId === order.orderId))} style={{ flex: 1, background: "#e00", color: "#fff", fontSize: 20, border: "none", borderRadius: 8, padding: 10 }}>刪除訂單</button>
+            <div style={{ display: "flex", gap: 12, marginTop: 12 }}>
+              <button onClick={() => { completeOrder(orders.findIndex(o => o === order)); }} style={{ flex: 1, background: "#e00", color: "#fff", fontSize: 20, border: "none", borderRadius: 8, padding: 10 }}>完成訂單</button>
+              <button onClick={() => removeOrder(orders.findIndex(o => o === order))} style={{ flex: 1, background: "#e00", color: "#fff", fontSize: 20, border: "none", borderRadius: 8, padding: 10 }}>刪除訂單</button>
             </div>
           )}
         </div>

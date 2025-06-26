@@ -2,17 +2,32 @@ import React, { useEffect, useState } from 'react';
 import OrderDashboard from './OrderDashboard';
 import { OrderProvider } from './OrderContext.jsx';
 
+const DEMO_ORDER = [
+  {
+    orderId: 1,
+    items: [{ name: '起司蛋餅', qty: 2, price: 55 }],
+    total: 110,
+    complete: false
+  }
+];
+
 function AdminApp() {
   const [orders, setOrders] = useState([]);
 
-  // 從 localStorage 讀取訂單，並監聽 localStorage 變化
+  // 每次載入都檢查 localStorage，沒資料就自動塞一筆假訂單
   useEffect(() => {
+    const stored = localStorage.getItem('orders');
+    if (stored && stored !== '[]') {
+      setOrders(JSON.parse(stored));
+    } else {
+      setOrders(DEMO_ORDER);
+      localStorage.setItem('orders', JSON.stringify(DEMO_ORDER));
+    }
+    // 監聽 localStorage 變化（多分頁同步）
     const loadOrders = () => {
-      const stored = localStorage.getItem('orders');
-      if (stored) setOrders(JSON.parse(stored));
-      else setOrders([]);
+      const s = localStorage.getItem('orders');
+      setOrders(s ? JSON.parse(s) : []);
     };
-    loadOrders();
     window.addEventListener('storage', loadOrders);
     return () => window.removeEventListener('storage', loadOrders);
   }, []);
