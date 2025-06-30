@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">點點點餐系統</string>
+    <string name="title_activity_main">點點點餐系統</string>
+    <string name="package_name">com.dindin.order</string>
+    <string name="custom_url_scheme">com.dindin.order</string>
+</resources>

@@ -23,5 +23,12 @@
   "bugs": {
     "url": "https://github.com/kodoko66414/customer-app/issues"
   },
-  "homepage": "https://github.com/kodoko66414/customer-app#readme"
+  "homepage": "https://github.com/kodoko66414/customer-app#readme",
+  "dependencies": {
+    "@capacitor/android": "^7.4.0",
+    "@capacitor/cli": "^7.4.0",
+    "@capacitor/core": "^7.4.0",
+    "mammoth": "^1.9.1",
+    "tesseract.js": "^6.0.1"
+  }
 }

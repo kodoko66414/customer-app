@@ -1,7 +1,6 @@
 import React from 'react';
-import ImageWithFallback from './ImageWithFallback';
 
-const ScrollableMenuView = ({ title, items, onAddToCart, getImageSrc }) => {
+const ScrollableMenuView = ({ title, items, onAddToCart }) => {
   // 模擬點擊音效
   const clickAudio = typeof window !== 'undefined' ? new Audio(import.meta.env.BASE_URL + 'sounds/like.mp3') : null;
 
@@ -42,18 +41,18 @@ const ScrollableMenuView = ({ title, items, onAddToCart, getImageSrc }) => {
             textAlign: 'center',
             cursor: 'pointer',
             transition: 'transform 0.2s',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            alignItems: 'center',
+            height: 160,
           }}
           onClick={(e) => handleItemClick(e, item)}
           onMouseEnter={(e) => e.currentTarget.style.transform = 'scale(1.05)'}
           onMouseLeave={(e) => e.currentTarget.style.transform = 'scale(1)'}
           >
-            <ImageWithFallback
-              src={getImageSrc ? getImageSrc(item.category) : `${import.meta.env.BASE_URL}images/${item.category}.png`}
-              alt={item.name}
-              style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 18, marginBottom: 12 }}
-            />
-            <div style={{ fontSize: 20, fontWeight: 'bold', marginBottom: 8, minHeight: 50, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>{item.name}</div>
-            <div style={{ fontSize: 18, color: '#ff4d30', fontWeight: 'bold' }}>NT${item.price}</div>
+            <div style={{ fontSize: 32, fontWeight: 'bold', width: '100%', marginBottom: 18, lineHeight: 1.1, wordBreak: 'break-all' }}>{item.name}</div>
+            <div style={{ fontSize: 28, color: '#ff4d30', fontWeight: 'bold', width: '100%' }}>NT${item.price}</div>
           </div>
         ))}
       </div>

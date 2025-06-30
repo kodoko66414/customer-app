@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { menu } from './menuData';
+import { getMenu } from './menuData';
 import ImageWithFallback from './ImageWithFallback';
 import ScrollableMenuView from './ScrollableMenuView';
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
@@ -38,51 +38,74 @@ function safePlay(audio) {
   }
 }
 
-function MenuPage({ onBack, onAddToCart, onShowCart, cart }) {
+function getCategory(name) {
+  if (name.includes('蛋餅') || name.includes('餅')) return '蛋餅';
+  if (name.includes('奶茶') || name.includes('茶')) return '奶茶';
+  if (name.includes('咖啡')) return '咖啡';
+  if (name.includes('蘿蔔糕')) return '蘿蔔糕';
+  if (name.includes('吐司') || name.includes('漢堡')) return '吐司/漢堡';
+  return '其他';
+}
+
+function groupMenuByCategory(menu) {
+  const groups = {};
+  menu.forEach(item => {
+    const cat = getCategory(item.name);
+    if (!groups[cat]) groups[cat] = [];
+    groups[cat].push(item);
+  });
+  return groups;
+}
+
+function getHotSellers(menu) {
+  // 從 localStorage 取得點餐次數
+  let stats = {};
+  try {
+    stats = JSON.parse(localStorage.getItem('order_stats') || '{}');
+  } catch {}
+  // 依據點餐次數排序，取前三名
+  return [...menu]
+    .map(item => ({ ...item, count: stats[item.id] || 0 }))
+    .sort((a, b) => b.count - a.count)
+    .slice(0, 3);
+}
+
+function MenuPage({ menu, onBack, onAddToCart, onShowCart, cart }) {
   const handleBack = () => {
     safePlay(likeAudio);
     onBack();
   };
-
-  const hotSellers = menu.slice(0, 3);
-  const allItems = menu;
-
+  const grouped = groupMenuByCategory(menu);
+  const hotSellers = getHotSellers(menu);
   return (
     <div style={{ background: '#f5f5f7', minHeight: '100vh', position: 'relative' }}>
       <button 
+        onClick={handleBack}
+        style={{ position: 'fixed', top: 24, left: 24, background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '8px 16px', fontSize: 18, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', zIndex: 10 }}
+      >返回</button>
+      <button 
         onClick={onShowCart} 
-        style={{ 
-            position: 'fixed', 
-            top: 36, 
-            right: 24, 
-            background: '#fff', 
-            border: '1px solid #eee', 
-            borderRadius: 12, 
-            padding: '8px 16px', 
-            fontSize: 18, 
-            cursor: 'pointer', 
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
-            display: 'flex',
-            alignItems: 'center',
-            gap: 8,
-            zIndex: 10
-        }}
+        style={{ position: 'fixed', top: 36, right: 24, background: '#fff', border: '1px solid #eee', borderRadius: 12, padding: '8px 16px', fontSize: 18, cursor: 'pointer', boxShadow: '0 2px 8px rgba(0,0,0,0.1)', display: 'flex', alignItems: 'center', gap: 8, zIndex: 10 }}
       >
         <span>🛒</span>
         <span>{cart.length}</span>
       </button>
       <div style={{ maxWidth: '100%', margin: '0 auto', fontFamily: 'Arial, sans-serif', paddingTop: 24, paddingBottom: 100 }}>
         <h1 style={{ fontSize: 40, textAlign: 'center', marginBottom: 32, letterSpacing: 8 }}>菜單</h1>
-        
         <ScrollableMenuView title="熱銷餐點" items={hotSellers} onAddToCart={onAddToCart} getImageSrc={getImageSrc} />
-        <ScrollableMenuView title="所有餐點" items={allItems} onAddToCart={onAddToCart} getImageSrc={getImageSrc} />
-
+        {Object.keys(grouped).map(cat => (
+          <ScrollableMenuView key={cat} title={cat} items={grouped[cat]} onAddToCart={onAddToCart} getImageSrc={getImageSrc} />
+        ))}
         <div style={{ position: 'fixed', bottom: 24, left: 24, right: 24, maxWidth: 400, margin: '0 auto' }}>
           <button onClick={handleBack} style={{ width: '100%', fontSize: 22, padding: 14, borderRadius: 14, background: '#ff9500', color: '#fff', border: 'none', boxShadow: '0 4px 12px rgba(255, 149, 0, 0.4)' }}>返回</button>
         </div>
       </div>
     </div>
   );
+}
+
+function getRandomOrderId() {
+  return ('' + Math.floor(100 + Math.random() * 900));
 }
 
 function CartPage({ cart, onBack, onRemove, onSubmit, lastOrderId }) {
@@ -136,7 +159,8 @@ function CartPage({ cart, onBack, onRemove, onSubmit, lastOrderId }) {
 }
 
 export default function Home() {
-  const [currentItem, setCurrentItem] = useState(menu[0]);
+  const [menu, setMenu] = useState(getMenu());
+  const [currentItem, setCurrentItem] = useState(getMenu()[0] || null);
   const [cart, setCart] = useState([]);
   const [showMenu, setShowMenu] = useState(false);
   const [showCart, setShowCart] = useState(false);
@@ -150,8 +174,8 @@ export default function Home() {
 
   // 取得下一個商品
   function getNextItem(item) {
-    const idx = menu.findIndex(i => i.id === item.id);
-    return menu[(idx + 1) % menu.length];
+    const idx = getMenu().findIndex(i => i.id === item.id);
+    return getMenu()[(idx + 1) % getMenu().length];
   }
 
   const handleAddToCart = (item) => {
@@ -235,16 +259,24 @@ export default function Home() {
       return acc;
     }, []);
     const total = cart.reduce((sum, item) => sum + item.price, 0);
-
-    // 新增到 Firestore
+    const orderId = getRandomOrderId();
+    // 統計點餐次數
+    let stats = {};
+    try {
+      stats = JSON.parse(localStorage.getItem('order_stats') || '{}');
+    } catch {}
+    cart.forEach(item => {
+      stats[item.id] = (stats[item.id] || 0) + 1;
+    });
+    localStorage.setItem('order_stats', JSON.stringify(stats));
     await addDoc(collection(db, "orders"), {
       items,
       total,
+      orderId,
       createdAt: serverTimestamp()
     });
-
     setCart([]);
-    setLastOrderId("已送出訂單");
+    setLastOrderId(orderId);
   };
 
   const handleRemoveFromCart = (index) => {
@@ -252,16 +284,11 @@ export default function Home() {
   };
 
   if (showMenu) {
-    return <MenuPage 
-      onBack={() => setShowMenu(false)} 
-      onAddToCart={handleAddToCart} 
-      onShowCart={() => {
-        if (likeAudio) { likeAudio.currentTime = 0; likeAudio.play(); }
-        setShowMenu(false);
-        setShowCart(true);
-      }} 
-      cart={cart} 
-    />;
+    return <MenuPage menu={menu} onBack={() => setShowMenu(false)} onAddToCart={handleAddToCart} onShowCart={() => {
+      if (likeAudio) { likeAudio.currentTime = 0; likeAudio.play(); }
+      setShowMenu(false);
+      setShowCart(true);
+    }} cart={cart} />;
   }
   if (showCart) {
     return <CartPage cart={cart} onBack={() => { setShowCart(false); setLastOrderId(null); }} onRemove={handleRemoveFromCart} onSubmit={handleSubmitOrder} lastOrderId={lastOrderId} />;
@@ -290,6 +317,10 @@ export default function Home() {
     );
   }
 
+  if (!currentItem) {
+    return <div style={{textAlign:'center',marginTop:80,fontSize:24}}>載入菜單中...</div>;
+  }
+
   const item = currentItem;
   const rotate = dragX / 18;
   const shadow = Math.min(Math.abs(dragX) / 10, 24);
@@ -307,10 +338,10 @@ export default function Home() {
               box-sizing: border-box !important;
             }
             .main-title {
-              font-size: 5.2vw !important;
+              font-size: 14vw !important;
             }
             .main-price {
-              font-size: 4.2vw !important;
+              font-size: 10vw !important;
             }
             .main-btn {
               font-size: 3.8vw !important;
@@ -333,10 +364,11 @@ export default function Home() {
                 background: '#fff',
                 borderRadius: 24,
                 boxShadow: `0 8px ${shadow + 24}px rgba(0,0,0,0.12)`,
-                padding: 28,
+                padding: '40px 24px',
                 marginBottom: 20,
                 width: '100%',
                 maxWidth: 420,
+                minHeight: 420,
                 position: 'relative',
                 userSelect: 'none',
                 touchAction: 'pan-y',
@@ -346,25 +378,27 @@ export default function Home() {
                 transition: 'box-shadow 0.2s',
                 transform: `translateX(${dragX}px) rotate(${rotate}deg)`,
                 boxSizing: 'border-box',
+                justifyContent: 'flex-end',
               }}
               onTouchStart={handleTouchStart}
               onTouchMove={handleTouchMove}
               onTouchEnd={handleTouchEnd}
             >
-              <div className="main-title" style={{ fontSize: 28, fontWeight: 'bold', textAlign: 'center', marginBottom: 16, letterSpacing: 2 }}>{item.name}</div>
-              <ImageWithFallback key={item.id} src={getImageSrc(item.category)} alt={item.name} style={{ width: '100%', maxWidth: 300, height: 'auto', aspectRatio: '16/11', objectFit: 'cover', borderRadius: 16, marginBottom: 16, background: '#f5f5f7', boxShadow: '0 2px 12px #eee' }} />
-              <div className="main-price" style={{ fontSize: 24, color: '#ff4d30', textAlign: 'center', fontWeight: 'bold', marginBottom: 18 }}>NT${item.price}</div>
-              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, width: '100%' }}>
-                <button className="main-btn" onClick={handleDislike} style={{ flex: 1, fontSize: 18, padding: '10px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                  <span style={{ fontSize: 22 }}>👎</span>
+              <div style={{ flex: 1 }} />
+              <div className="main-title" style={{ fontSize: 96, fontWeight: 'bold', textAlign: 'center', width: '100%', marginBottom: 32, letterSpacing: 2 }}>{item.name}</div>
+              <div className="main-price" style={{ fontSize: 80, color: '#ff4d30', textAlign: 'center', fontWeight: 'bold', width: '100%', marginBottom: 48 }}>{`NT$${item.price}`}</div>
+              <div style={{ flex: 1 }} />
+              <div style={{ display: 'flex', justifyContent: 'space-between', gap: 8, width: '100%', marginTop: 'auto' }}>
+                <button className="main-btn" onClick={handleDislike} style={{ flex: 1, fontSize: 18, padding: '18px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                  <span style={{ fontSize: 32 }}>👎</span>
                   不喜歡
                 </button>
-                <button className="main-btn" onClick={handleShowMenu} style={{ flex: 1, fontSize: 18, padding: '10px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                  <span style={{ fontSize: 22 }}>≡</span>
+                <button className="main-btn" onClick={handleShowMenu} style={{ flex: 1, fontSize: 18, padding: '18px 0', borderRadius: 14, background: '#fff', color: '#333', border: '2px solid #eee', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                  <span style={{ fontSize: 32 }}>≡</span>
                   菜單
                 </button>
-                <button className="main-btn" onClick={handleLike} style={{ flex: 1, fontSize: 18, padding: '10px 0', borderRadius: 14, background: '#007aff', color: '#fff', border: 'none', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
-                  <span style={{ fontSize: 22 }}>👍</span>
+                <button className="main-btn" onClick={handleLike} style={{ flex: 1, fontSize: 18, padding: '18px 0', borderRadius: 14, background: '#007aff', color: '#fff', border: 'none', marginBottom: 0, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4, fontWeight: 600 }}>
+                  <span style={{ fontSize: 32 }}>👍</span>
                   喜歡
                 </button>
               </div>

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>顧客點餐系統</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f7;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .store-info {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .store-name {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .menu-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        
+        .menu-category {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .category-title {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            color: #333;
+        }
+        
+        .menu-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .menu-item:last-child {
+            border-bottom: none;
+        }
+        
+        .item-name {
+            font-size: 16px;
+            flex: 1;
+        }
+        
+        .item-price {
+            font-size: 16px;
+            color: #ff4d30;
+            font-weight: bold;
+            margin: 0 15px;
+        }
+        
+        .add-btn {
+            background: #007aff;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 8px 16px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .add-btn:hover {
+            background: #0056cc;
+        }
+        
+        .cart-container {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            min-width: 200px;
+        }
+        
+        .cart-title {
+            font-size: 18px;
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .remove-btn {
+            background: #ff4d30;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 4px 8px;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        
+        .cart-total {
+            font-size: 16px;
+            font-weight: bold;
+            margin-top: 10px;
+            text-align: right;
+        }
+        
+        .submit-btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+        }
+        
+        .submit-btn:hover {
+            background: #218838;
+        }
+        
+        .loading {
+            text-align: center;
+            font-size: 18px;
+            color: #666;
+            padding: 40px;
+        }
+        
+        .error {
+            text-align: center;
+            font-size: 18px;
+            color: #ff4d30;
+            padding: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>點餐系統</h1>
+    </div>
+    
+    <div class="store-info" id="storeInfo" style="display: none;">
+        <div class="store-name" id="storeName"></div>
+    </div>
+    
+    <div class="menu-container" id="menuContainer">
+        <div class="loading">載入中...</div>
+    </div>
+    
+    <div class="cart-container" id="cartContainer" style="display: none;">
+        <div class="cart-title">購物車</div>
+        <div id="cartItems"></div>
+        <div class="cart-total" id="cartTotal">總計: NT$0</div>
+        <button class="submit-btn" onclick="submitOrder()">送出訂單</button>
+    </div>
+    
+    <script src="menu.js"></script>
+</body>
+</html> 

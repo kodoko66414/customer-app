@@ -1,0 +1,33 @@
+{
+  "storeName": "活力早餐店",
+  "logo": "logo002.png",
+  "categories": [
+    {
+      "name": "漢堡",
+      "items": [
+        { "name": "豬肉漢堡", "price": 45 },
+        { "name": "雞肉漢堡", "price": 50 },
+        { "name": "牛肉漢堡", "price": 60 },
+        { "name": "蔬菜漢堡", "price": 40 }
+      ]
+    },
+    {
+      "name": "三明治",
+      "items": [
+        { "name": "火腿三明治", "price": 35 },
+        { "name": "雞蛋三明治", "price": 30 },
+        { "name": "鮪魚三明治", "price": 40 },
+        { "name": "起司三明治", "price": 35 }
+      ]
+    },
+    {
+      "name": "飲品",
+      "items": [
+        { "name": "鮮奶茶", "price": 45 },
+        { "name": "檸檬茶", "price": 35 },
+        { "name": "柳橙汁", "price": 40 },
+        { "name": "豆漿", "price": 25 }
+      ]
+    }
+  ]
+} 

@@ -1,0 +1,43 @@
+{
+  "storeName": "早安厚蛋店",
+  "logo": "logo001.png",
+  "categories": [
+    {
+      "name": "吐司",
+      "items": [
+        { "name": "厚蛋吐司", "price": 35 },
+        { "name": "火腿蛋吐司", "price": 40 },
+        { "name": "起司蛋吐司", "price": 45 },
+        { "name": "鮪魚蛋吐司", "price": 50 }
+      ]
+    },
+    {
+      "name": "蛋餅",
+      "items": [
+        { "name": "起司蛋餅", "price": 55 },
+        { "name": "火腿蛋餅", "price": 45 },
+        { "name": "鮪魚蛋餅", "price": 50 },
+        { "name": "玉米蛋餅", "price": 40 }
+      ]
+    },
+    {
+      "name": "飲品",
+      "items": [
+        { "name": "香草奶茶", "price": 40 },
+        { "name": "巧克力奶茶", "price": 40 },
+        { "name": "美式咖啡", "price": 50 },
+        { "name": "拿鐵咖啡", "price": 65 },
+        { "name": "紅茶", "price": 30 },
+        { "name": "綠茶", "price": 30 }
+      ]
+    },
+    {
+      "name": "點心",
+      "items": [
+        { "name": "蘿蔔糕", "price": 35 },
+        { "name": "薯餅", "price": 25 },
+        { "name": "小熱狗", "price": 20 }
+      ]
+    }
+  ]
+} 
